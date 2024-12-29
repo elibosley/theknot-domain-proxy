@@ -19,7 +19,7 @@ export default {
 		});
 
 		class BodyRewriter {
-			element(element) {
+			element(element: Element) {
 				element.append(
 					` 
 					<style>
@@ -30,76 +30,63 @@ export default {
 					}
 
 					#keyboard-cat {
-						width: 200px;
+						width: 100px;
 						height: auto;
-						animation: typing 2s infinite;
 					}
 
-					@keyframes typing {
-						0% {
-						transform: rotate(0deg);
-						}
-						50% {
-						transform: rotate(-5deg);
-						}
-						100% {
-						transform: rotate(0deg);
-						}
-					}
 					</style>
+					<script src="https://unpkg.com/freezeframe/dist/freezeframe.min.js"></script>
 					<script>
-						// Trigger animation as you type
-						document.addEventListener('keydown', function() {
-							const cat = document.getElementById('keyboard-cat');
-							if (cat) {
-							cat.style.animation = 'typing 2s infinite';
-							}
-						});
-
 						const newContent = document.createElement('div');
 						const container = document.createElement('div');
 						container.id = "keyboard-cat-container";
 
 						const img = document.createElement('img');
-						img.src = "";
+						img.src = "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif";
 						img.alt = "Keyboard Cat";
+
 						img.id = "keyboard-cat";
 						container.appendChild(img);
 						newContent.appendChild(container);
 
 
+
 						// Function to add the event listener to existing links
 						function addEventListeners() {
 							document.querySelectorAll('a[href="/us/taylor-woloszynski-and-elijah-bosley-sep-2025/rsvp"]').forEach(link => {
-							const newLink = link.cloneNode(true); // Clone the <a> tag with all attributes
-							newLink.href = 'https://theknot.com/us/taylor-woloszynski-and-elijah-bosley-sep-2025/rsvp'; // Change the href to the new URL
-							newLink.target = '_blank'; // Open the link in a new tab
-							// Replace the original link with the new one, preserving the inner content and styles
-							link.parentNode.replaceChild(newLink, link);
+								link.href = 'https://theknot.com/us/taylor-woloszynski-and-elijah-bosley-sep-2025/rsvp';
+								link.target = '_blank';
 							});
 
+							const div = document.querySelector('footer > div:nth-of-type(2)');
 
-							// Select all divs inside the second footer
-							const divs = document.querySelectorAll('footer > div');
-							const secondDiv = divs.length >=2 ? divs[1] : null
-							if (secondDiv) {
-							// Remove all children from the second div
-							while (secondDiv.firstChild) {
-								secondDiv.removeChild(secondDiv.firstChild);
-							}
-							secondDiv.appendChild(newContent);
+							if (div) {
+							    div.style.display = 'none';
+								div.insertAdjacentElement('afterend', newContent);
 							}
 						}
 
-						
 
-						// Observe DOM changes to catch dynamically added links
-						const observer = new MutationObserver(addEventListeners);
+						// MutationObserver to detect changes in the DOM
+						const observer = new MutationObserver((mutationsList, observer) => {
+							// Temporarily disconnect the observer to prevent the infinite loop
+							observer.disconnect();
+
+							try {
+								// Your DOM modification code goes here
+								addEventListeners(); // For example, calling your addEventListeners function
+							} finally {
+								// Reconnect the observer after modifications are done
+								observer.observe(document.body, { childList: true, subtree: true });
+							}
+						});
+
+
+
+												
+						// Observe DOM changes
 						observer.observe(document.body, { childList: true, subtree: true });
-
-						// Run the function once for the existing links on page load
 						addEventListeners();
-
 
 						</script>
           `,
